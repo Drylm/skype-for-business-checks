@@ -18,15 +18,28 @@ function Read-Registry($registryHive, $key, $propertyName) {
     return $value
 }
 
+function Check-SkypeForBusinessPrerequisites() {
+    Try {
+		Check-SkypeForBusiness2013SDKPrerequisites
+		Check-SkypeForBusiness2013SDKUISuppressionMode
+
+		Check-SkypeForBusiness2016SDKPrerequisites
+	} Catch [System.InvalidOperationException] {
+        #use $_ to access the exception
+        Write-Host $_.Exception.Message
+	}
+
+}
+
 function Check-SkypeForBusiness2013SDKPrerequisites() {
     $lync2013Key = "SOFTWARE\\Microsoft\\Office\\15.0\\Registration\\{0EA305CE-B708-4D79-8087-D636AB0F1A4D}"
     $lync2013Value = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $lync2013Key "ProductName"
 
     $office2013VersionKey = "SOFTWARE\\Microsoft\\Office\\15.0\\Common\\ProductVersion"
-	$office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionValue "LastProduct"
+	$office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionKey "LastProduct"
 	
     if (($lync2013Value -eq $null) -Or ($office2013VersionValue -eq $null)) {
-		throw New-Object System.InvalidOperationException("Lync 2013 retrieved or Office 2013 SP1 not installed")
+		throw New-Object System.InvalidOperationException("Lync 2013 or Office 2013 SP1 not installed")
 	}
 
 	if (($lync2013Value -ne "Microsoft Lync 2013") -Or ($office2013VersionValue -ne "15.0.4569.1506")) {
@@ -51,14 +64,12 @@ function Check-SkypeForBusiness2016SDKPrerequisites() {
 
 function Check-SkypeForBusiness2013SDKUISuppressionMode() {
     $office2013LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\15.0\\Lync"
-    $office2013LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2013LyncUISuppressionModeKey, "UISuppressionMode"
+    $office2013LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2013LyncUISuppressionModeKey "UISuppressionMode"
 
-	if (($office2013LyncUISuppressionModeValue -eq $null) -Or ($office2013LyncUISuppressionModeValue.Equals -ne "1")) {
+	if (($office2013LyncUISuppressionModeValue -eq $null) -Or ($office2013LyncUISuppressionModeValue -ne "1")) {
 	    throw New-Object System.InvalidOperationException("Skype for Business client is not setup to run in UISuppressionMode. Please run the script under support\\skype for business.");
 	}
 }
 
 
-$keys = Get-SkypeForBusiness2013RegistryKeys
-#Check-SkypeSDKPrerequisites($keys);
-CheckForSkypeForBusiness2016
+Check-SkypeForBusinessPrerequisites

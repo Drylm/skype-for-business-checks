@@ -5,7 +5,7 @@
             "name": "PowerShell",
             "type": "PowerShell",
             "request": "launch",
-            "program": "E:\\dev\\monitor\\git\\ske\\gsx.ske.scenarioscancomponents\\Gsx.SkeSkybeForBusinessScanComponent\\resources\\skype_for_business_pre_requisites.ps1",
+            "program": "${workspaceRoot}\\skype_for_business_prerequisites.ps1",
             "args": [],
             "cwd": "${file}"
         }
