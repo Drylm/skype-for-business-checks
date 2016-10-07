@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell",
+            "type": "PowerShell",
+            "request": "launch",
+            "program": "E:\\dev\\monitor\\git\\ske\\gsx.ske.scenarioscancomponents\\Gsx.SkeSkybeForBusinessScanComponent\\resources\\skype_for_business_pre_requisites.ps1",
+            "args": [],
+            "cwd": "${file}"
+        }
+    ]
+}
