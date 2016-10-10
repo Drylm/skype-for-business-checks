@@ -4,15 +4,32 @@ function Read-Registry($registryHive, $key, $propertyName) {
     $localKey = [Microsoft.Win32.RegistryKey]::OpenBaseKey($registryHive, [Microsoft.Win32.RegistryView]::Registry64)
     $localKey = $localKey.OpenSubKey($key)
     if ($localKey -ne $null) {
-        $value = $localKey.GetValue($propertyName).ToString()
+
+        $property = $localKey.GetValue($propertyName)
+
+        if ($property -eq $null) {
+            throw New-Object System.Exception ("$propertyName has not been found")
+        }
+
+        $value = $property.ToString()
         return $value
     }
 
     $localKey32 = [Microsoft.Win32.RegistryKey]::OpenBaseKey($registryHive, [Microsoft.Win32.RegistryView]::Registry32)
     $localKey32 = $localKey32.OpenSubKey($key)
     if ($localKey32 -ne $null) {
-        $value = $localKey32.GetValue($propertyName).ToString()
+
+        $property = $localKey32.GetValue($propertyName)
+
+        if ($property -eq $null) {
+            throw New-Object System.Exception ("$propertyName has not been found")
+        }
+
+        $value = $property.ToString()
         return $value
+    }
+    else {
+        throw New-Object System.Exception ("Registry Key $key has not been found")
     }
 
     return $value
@@ -85,8 +102,8 @@ function Check-SkypeForBusiness2016SDKPrerequisites() {
 
     Check-SkypeForBusiness2013SDKUISuppressionMode
 
-    $office2016LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\16.0\\Lync"
-    $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode"
+    $office2016LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\16.0\\Lyn"
+    $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode2"
 
 	if ($office2016LyncUISuppressionModeValue -ne "1") {
 		Write-Host "  - Skype for Business client 2016 has been detected and is not setup to run in UISuppressionMode. Please set the registry : $office2016LyncUISuppressionModeKey = 1" -f "red"
