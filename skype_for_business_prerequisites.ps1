@@ -1,4 +1,4 @@
-function Read-Registry($registryHive, $key, $propertyName) {
+function Read-Registry2($registryHive, $key, $propertyName) {
     $value= ""
 
     $localKey = [Microsoft.Win32.RegistryKey]::OpenBaseKey($registryHive, [Microsoft.Win32.RegistryView]::Registry64)
@@ -33,6 +33,15 @@ function Read-Registry($registryHive, $key, $propertyName) {
     }
 
     return $value
+}
+
+function Read-Registry($registryHive, $key, $propertyName) {
+    try {
+        $value = Read-Registry $registryHive $key $propertyName
+    }
+    catch [System.Exception] {
+        Write-Error $_.Exception.Message
+    }
 }
 
 function Check-SkypeForBusinessPrerequisites() {
