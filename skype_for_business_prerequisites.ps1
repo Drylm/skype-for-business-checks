@@ -37,10 +37,14 @@ function Read-Registry2($registryHive, $key, $propertyName) {
 
 function Read-Registry($registryHive, $key, $propertyName) {
     try {
-        $value = Read-Registry $registryHive $key $propertyName
+        $value = Read-Registry2 $registryHive $key $propertyName
+        return $value
     }
     catch [System.Exception] {
-        Write-Error $_.Exception.Message
+        $message = $_.Exception.Message
+        Write-Host $message -f "red"
+
+        return ""
     }
 }
 
@@ -55,7 +59,7 @@ function Check-SkypeForBusinessPrerequisites() {
         Write-Host "Checks Prerequisites for a skype for business 2016 installation"
 		Check-SkypeForBusiness2016SDKPrerequisites
 	} Catch [System.InvalidOperationException] {
-        Write-Host $_.Exception.Message
+        Write-Host $_.Exception.Message -f "red"
 	}
 
 }
@@ -68,13 +72,13 @@ function Check-SkypeForBusiness2013SDKPrerequisites() {
 	$office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionKey "LastProduct"
 	
     if ($lync2013Value -eq $null) {
-        Write-Error "  - Lync 2013 not installed."
+        Write-Host "  - Lync 2013 not installed." -f "red"
     } else {
         Write-Host "  - Lync 2013 installation found: $lync2013Value."
     }
 
     if ($office2013VersionValue -eq $null) {
-        Write-Error "  - Office 2013 not installed."
+        Write-Host "  - Office 2013 not installed." -f "red"
     } else {
         Write-Host "  - Office 2013 installation found: $office2013VersionValue."
     }
@@ -104,20 +108,48 @@ function Check-SkypeForBusiness2016SDKPrerequisites() {
     $lync2016Key = "SOFTWARE\\Microsoft\\Office\\16.0\\Registration\\{03CA3B9A-0869-4749-8988-3CBC9D9F51BB}"
     $lync2016Value = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $lync2016Key "ProductName"
     if ($lync2016Value -ne "Skype for Business 2016") {
-        Write-Error "  - Skype for Business 2016 not installed."
+        Write-Host "  - Skype for Business 2016 not installed."
     } else {
         Write-Host "  - Skype for Business 2016 installation found: $lync2016Value."
     }
 
     Check-SkypeForBusiness2013SDKUISuppressionMode
 
-    $office2016LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\16.0\\Lyn"
-    $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode2"
+    $office2016LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\16.0\\Lync"
+    $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode"
 
 	if ($office2016LyncUISuppressionModeValue -ne "1") {
 		Write-Host "  - Skype for Business client 2016 has been detected and is not setup to run in UISuppressionMode. Please set the registry : $office2016LyncUISuppressionModeKey = 1" -f "red"
 	} else {
         Write-Host "  - Skype for Business client 2016 is setup to run in UISuppressionMode."
+    }
+
+    Check-SkypeForBusiness2016ISignInConfigurationPatch
+}
+
+function Check-SkypeForBusiness2016ISignInConfigurationPatch() {
+    Write-Host "  SignInConfiguration patch deployment check."
+    $interfaceKey = "Interface\{61CE9972-C619-4A88-A5D1-D2DFBCD4D2A1}"
+    $interfaceValue = Read-Registry ([Microsoft.Win32.RegistryHive]::ClassesRoot) $interfaceKey ""
+
+    $proxyStubClsid32Key = "$interfaceKey\ProxyStubClsid32"
+    $proxyStubClsid32Value = Read-Registry ([Microsoft.Win32.RegistryHive]::ClassesRoot) $proxyStubClsid32Key ""
+
+    $typeLibKey = "$interfaceKey\TypeLib"
+    $typeLibValue = Read-Registry ([Microsoft.Win32.RegistryHive]::ClassesRoot) $typeLibKey ""
+    $typeLibVersion = Read-Registry ([Microsoft.Win32.RegistryHive]::ClassesRoot) $typeLibKey "Version"
+
+    if (($interfaceValue -ne "ISignInConfiguration2") -Or ($proxyStubClsid32Value -ne "{00020424-0000-0000-C000-000000000046}") -Or
+        ($typeLibValue -ne "{B9AA1F11-F480-4054-A84E-B5D9277E40A8}") -Or ($typeLibVersion -ne "1.0")) {
+
+            Write-Host "  - SignInConfiguration patch not deployed." -f "red"
+            Write-Host "    - Interface value = $interfaceValue - expected ISignInConfiguration2"
+            Write-Host "    - ProxyStubClsid32 value = $proxyStubClsid32Value - expected {00020424-0000-0000-C000-000000000046}"
+            Write-Host "    - TypeLib value = $typeLibValue - expected {B9AA1F11-F480-4054-A84E-B5D9277E40A8}"
+            Write-Host "    - TypeLib version value = $typeLibVersion - expected 1.0"
+    }
+    else {
+        Write-Host "  - SignInConfiguration patch correctly deployed."
     }
 }
 
