@@ -65,10 +65,10 @@ function Check-SkypeForBusinessPrerequisites() {
 }
 
 function Check-SkypeForBusiness2013SDKPrerequisites() {
-    $lync2013Key = "SOFTWARE\\Microsoft\\Office\\15.0\\Registration\\{0EA305CE-B708-4D79-8087-D636AB0F1A4D}"
+    $lync2013Key = "SOFTWARE\Microsoft\Office\15.0\Registration\{0EA305CE-B708-4D79-8087-D636AB0F1A4D}"
     $lync2013Value = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $lync2013Key "ProductName"
 
-    $office2013VersionKey = "SOFTWARE\\Microsoft\\Office\\15.0\\Common\\ProductVersion"
+    $office2013VersionKey = "SOFTWARE\Microsoft\Office\15.0\Common\ProductVersion"
 	$office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionKey "LastProduct"
 	
     if ($lync2013Value -eq $null) {
@@ -94,7 +94,7 @@ function Check-SkypeForBusiness2013SDKPrerequisites() {
 }
 
 function Check-SkypeForBusiness2013SDKUISuppressionMode() {
-    $office2013LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\15.0\\Lync"
+    $office2013LyncUISuppressionModeKey = "Software\Microsoft\Office\15.0\Lync"
     $office2013LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2013LyncUISuppressionModeKey "UISuppressionMode"
 
 	if (($office2013LyncUISuppressionModeValue -eq $null) -Or ($office2013LyncUISuppressionModeValue -ne "1")) {
@@ -105,7 +105,7 @@ function Check-SkypeForBusiness2013SDKUISuppressionMode() {
 }
 
 function Check-SkypeForBusiness2016SDKPrerequisites() {
-    $lync2016Key = "SOFTWARE\\Microsoft\\Office\\16.0\\Registration\\{03CA3B9A-0869-4749-8988-3CBC9D9F51BB}"
+    $lync2016Key = "SOFTWARE\Microsoft\Office\16.0\Registration\{03CA3B9A-0869-4749-8988-3CBC9D9F51BB}"
     $lync2016Value = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $lync2016Key "ProductName"
     if ($lync2016Value -ne "Skype for Business 2016") {
         Write-Host "  - Skype for Business 2016 not installed."
@@ -115,7 +115,7 @@ function Check-SkypeForBusiness2016SDKPrerequisites() {
 
     Check-SkypeForBusiness2013SDKUISuppressionMode
 
-    $office2016LyncUISuppressionModeKey = "Software\\Microsoft\\Office\\16.0\\Lync"
+    $office2016LyncUISuppressionModeKey = "Software\Microsoft\Office\16.0\Lync"
     $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode"
 
 	if ($office2016LyncUISuppressionModeValue -ne "1") {
