@@ -143,6 +143,7 @@ function Check-SkypeForBusiness2016ISignInConfigurationPatch() {
         ($typeLibValue -ne "{B9AA1F11-F480-4054-A84E-B5D9277E40A8}") -Or ($typeLibVersion -ne "1.0")) {
 
             Write-Host "  - SignInConfiguration patch not deployed." -f "red"
+            Write-Host "    - Run the script sb4-skype4Business 2016.reg"
             Write-Host "    - Interface value = $interfaceValue - expected ISignInConfiguration2"
             Write-Host "    - ProxyStubClsid32 value = $proxyStubClsid32Value - expected {00020424-0000-0000-C000-000000000046}"
             Write-Host "    - TypeLib value = $typeLibValue - expected {B9AA1F11-F480-4054-A84E-B5D9277E40A8}"
