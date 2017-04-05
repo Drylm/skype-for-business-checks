@@ -19,3 +19,5 @@ Usage
 skype-driver signInAddress username password
 ```
 
+Prerequisites: *c:\tmp* directory must exist. Traces are generated in this folder.
+
