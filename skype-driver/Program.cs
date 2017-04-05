@@ -16,7 +16,6 @@ namespace skype_driver
                 return;
             }
 
-
             try
             {
                 using (var client = new SkypeForBusiness.Client())
@@ -24,7 +23,10 @@ namespace skype_driver
                     client.SignIn(args[0], args[1], args[2]);
                     var status = client.SignInStatus;
 
-                    Trace.WriteLine(status.Item2);
+                    Trace.WriteLine($"Status = {status.Item1.ToString()}({status.Item2})");
+
+                    System.Threading.Thread.Sleep(1000);
+                    client.SignOut();
                 }
             }
             catch(Exception ex)
@@ -48,8 +50,8 @@ namespace skype_driver
 
         private static void usage()
         {
-            Trace.WriteLine("Usage: ");
-            Trace.WriteLine("  skype-driver signInAddress username password");
+            Console.WriteLine("Usage: ");
+            Console.WriteLine("  skype-driver signInAddress username password");
         }
     }
 }
