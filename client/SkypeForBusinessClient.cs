@@ -163,13 +163,12 @@ namespace SkypeForBusiness
 
                 if (!IsClientValid)
                 {
-                    Trace.Write("Attempt {retryToGetValidClient}/3 to get a valid Lync Client Reference");
+                    Trace.Write($"Attempt {retryToGetValidClient}/3 to get a valid Lync Client Reference");
 
                     if (_lyncClient.State == ClientState.SigningOut)
                     {
                         KillLyncProcess();
                     }
-
 
                     retryToGetValidClient += 1;
                     Thread.Sleep(250);
@@ -204,6 +203,7 @@ namespace SkypeForBusiness
 
                 if (_lyncClient.State == ClientState.Uninitialized)
                 {
+                    Trace.WriteLine("SignIn: ClientState.Uninitialized");
                     _lyncClient.BeginInitialize(ar =>
                     {
                         _lyncClient.EndInitialize(ar);
@@ -214,12 +214,13 @@ namespace SkypeForBusiness
                 }
                 else if ((_lyncClient.State == ClientState.SignedOut))
                 {
+                    Trace.WriteLine("SignIn: ClientState.SignedOut");
                     SignUserIn();
-
-                    // A sign in operation Is pending
                 }
                 else if ((_lyncClient.State == ClientState.SigningIn) || _lyncClient.State == ClientState.SignedIn)
                 {
+                    Trace.WriteLine($"SignIn: ClientState.SigningIn ({ClientState.SigningIn}) || ClientState.SignedIn ({ClientState.SignedIn})");
+                    Trace.WriteLine($"SignIn: {_lyncClient.State}");
                     SignOut();
                     SignUserIn();
                 }
@@ -232,7 +233,7 @@ namespace SkypeForBusiness
             }
             catch (Exception ex)
             {
-                Debug.Assert(false, ex.Message);
+                Trace.WriteLine($"Generic Exception during SignIn {ex.Message}");
             }
         }
 
@@ -331,6 +332,7 @@ namespace SkypeForBusiness
 
         public void SignOut()
         {
+            Trace.WriteLine("SigningOut");
             if (_lyncClient == null)
                 return;
 
@@ -363,6 +365,8 @@ namespace SkypeForBusiness
                 {
                     _lyncClient.SignInConfiguration.ForgetMe(_signInAddress);
                 }
+
+                Trace.WriteLine("SignedOut");
             }
             catch (ArgumentException ae)
             {
