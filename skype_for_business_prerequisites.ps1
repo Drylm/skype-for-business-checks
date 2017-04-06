@@ -52,15 +52,16 @@ function Check-SkypeForBusinessPrerequisites() {
     Try {
         Write-Host "Checks Prerequisites for a lync 2013 installation"
 
-		Check-SkypeForBusiness2013SDKPrerequisites
-		Check-SkypeForBusiness2013SDKUISuppressionMode
+        Check-OfficeAdalAuthentication "15.0"
+		    Check-SkypeForBusiness2013SDKPrerequisites
+		    Check-SkypeForBusiness2013SDKUISuppressionMode
 
         Write-Host ""
         Write-Host "Checks Prerequisites for a skype for business 2016 installation"
-		Check-SkypeForBusiness2016SDKPrerequisites
-	} Catch [System.InvalidOperationException] {
+		    Check-SkypeForBusiness2016SDKPrerequisites
+	  } Catch [System.InvalidOperationException] {
         Write-Host $_.Exception.Message -f "red"
-	}
+	  }
 
 }
 
@@ -69,8 +70,8 @@ function Check-SkypeForBusiness2013SDKPrerequisites() {
     $lync2013Value = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $lync2013Key "ProductName"
 
     $office2013VersionKey = "SOFTWARE\Microsoft\Office\15.0\Common\ProductVersion"
-	$office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionKey "LastProduct"
-	
+	  $office2013VersionValue = Read-Registry ([Microsoft.Win32.RegistryHive]::LocalMachine) $office2013VersionKey "LastProduct"
+
     if ($lync2013Value -eq $null) {
         Write-Host "  - Lync 2013 not installed." -f "red"
     } else {
@@ -93,6 +94,17 @@ function Check-SkypeForBusiness2013SDKPrerequisites() {
 	}
 }
 
+function Check-OfficeAdalAuthentication($version) {
+    $officeIdentityKey = "Software\Microsoft\Office\$version\Common\Identity"
+    $adalValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $officeIdentityKey "EnableADAL"
+
+	  if (($adalValue -eq $null) -Or ($adalValue -ne "0")) {
+	      Write-Host "  - Please disable ADAL authentication mechanism for office $version" -f "red"
+	  } else {
+        Write-Host "  - ADAL Authentication for Office $version is disabled."
+    }
+}
+
 function Check-SkypeForBusiness2013SDKUISuppressionMode() {
     $office2013LyncUISuppressionModeKey = "Software\Microsoft\Office\15.0\Lync"
     $office2013LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2013LyncUISuppressionModeKey "UISuppressionMode"
@@ -100,7 +112,7 @@ function Check-SkypeForBusiness2013SDKUISuppressionMode() {
 	if (($office2013LyncUISuppressionModeValue -eq $null) -Or ($office2013LyncUISuppressionModeValue -ne "1")) {
 	    Write-Host "  - Skype for Business client is not setup to run in UISuppressionMode. Please set the registry : $office2013LyncUISuppressionModeKey = 1" -f "red"
 	} else {
-        Write-Host "  - Skype for Business client is setup to run in UISuppressionMode."
+      Write-Host "  - Skype for Business client is setup to run in UISuppressionMode."
     }
 }
 
@@ -113,16 +125,17 @@ function Check-SkypeForBusiness2016SDKPrerequisites() {
         Write-Host "  - Skype for Business 2016 installation found: $lync2016Value."
     }
 
+    Check-OfficeAdalAuthentication "16.0"
     Check-SkypeForBusiness2013SDKUISuppressionMode
 
     $office2016LyncUISuppressionModeKey = "Software\Microsoft\Office\16.0\Lync"
     $office2016LyncUISuppressionModeValue = Read-Registry ([Microsoft.Win32.RegistryHive]::CurrentUser) $office2016LyncUISuppressionModeKey "UISuppressionMode"
 
 	if ($office2016LyncUISuppressionModeValue -ne "1") {
-		Write-Host "  - Skype for Business client 2016 has been detected and is not setup to run in UISuppressionMode. Please set the registry : $office2016LyncUISuppressionModeKey = 1" -f "red"
+		  Write-Host "  - Skype for Business client 2016 has been detected and is not setup to run in UISuppressionMode. Please set the registry : $office2016LyncUISuppressionModeKey = 1" -f "red"
 	} else {
-        Write-Host "  - Skype for Business client 2016 is setup to run in UISuppressionMode."
-    }
+      Write-Host "  - Skype for Business client 2016 is setup to run in UISuppressionMode."
+  }
 
     Check-SkypeForBusiness2016ISignInConfigurationPatch
 }
