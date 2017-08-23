@@ -11,4 +11,4 @@ This script checks if the current Skype For Business deployment (not able to det
 
 # Explanations
 
-http://blog.drylm.org/posts/skype-for-business-sdk-prerequisites.html
+https://blog.drylm.org/posts/skype-for-business-sdk-prerequisites.html
