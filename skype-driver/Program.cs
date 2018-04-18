@@ -50,8 +50,10 @@ namespace skype_driver
 
         private static void usage()
         {
-            Console.WriteLine("Usage: ");
-            Console.WriteLine("  skype-driver signInAddress username password");
+            Trace.WriteLine("Usage: ");
+            Trace.WriteLine("  skype-driver signInAddress username password");
+
+            Trace.Flush();
         }
     }
 }
